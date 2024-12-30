@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2024 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2018 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -24,79 +24,55 @@ License
 \*---------------------------------------------------------------------------*/
 
 #include "dual.H"
+#include "IOstreams.H"
 
-// * * * * * * * * * * * * * * Static Data Members * * * * * * * * * * * * * //
-
-const dataType Foam::dual::staticData();
-
-
-// * * * * * * * * * * * * * Static Member Functions * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * Private Member Functions  * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * Protected Member Functions  * * * * * * * * * * * //
-
+#include <sstream>
 
 // * * * * * * * * * * * * * * * * Constructors  * * * * * * * * * * * * * * //
 
-Foam::dual::dual()
-:
-    baseClassName(),
-    data_()
-{}
-
-
-Foam::dual::dual(const dataType& data)
-:
-    baseClassName(),
-    data_(data)
-{}
-
-
-Foam::dual::dual(const dual&)
-:
-    baseClassName(),
-    data_()
-{}
-
-
-// * * * * * * * * * * * * * * * * Selectors * * * * * * * * * * * * * * * * //
-
-Foam::autoPtr<Foam::dual>
-Foam::dual::New()
+Foam::dual::dual(Istream& is)
 {
-    return autoPtr<dual>(new dual);
+    is >> *this;
 }
 
 
-// * * * * * * * * * * * * * * * * Destructor  * * * * * * * * * * * * * * * //
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-Foam::dual::~dual()
-{}
-
-
-// * * * * * * * * * * * * * * Member Functions  * * * * * * * * * * * * * * //
-
-
-// * * * * * * * * * * * * * * Member Operators  * * * * * * * * * * * * * * //
-
-void Foam::dual::operator=(const dual& rhs)
+Foam::word Foam::name(const dual& d)
 {
-    // Check for assignment to self
-    if (this == &rhs)
-    {
-        FatalErrorInFunction
-            << "Attempted assignment to self"
-            << abort(FatalError);
-    }
+    std::ostringstream buf;
+    buf << '(' << d.value() << ',' << d.derivative() << ')';
+    return buf.str();
 }
 
-// * * * * * * * * * * * * * * Friend Functions  * * * * * * * * * * * * * * //
+
+// * * * * * * * * * * * * * * * IOstream Operators  * * * * * * * * * * * * //
+
+Foam::Istream& Foam::operator>>(Istream& is, dual& d)
+{
+    // Read beginning of dual
+    is.readBegin("dual");
+
+    is  >> d.value_ >> d.derivative_;
+
+    // Read end of dual
+    is.readEnd("dual");
+
+    // Check state of Istream
+    is.check("operator>>(Istream&, dual&)");
+
+    return is;
+}
 
 
-// * * * * * * * * * * * * * * Friend Operators * * * * * * * * * * * * * * //
+Foam::Ostream& Foam::operator<<(Ostream& os, const dual& d)
+{
+    os  << token::BEGIN_LIST
+        << d.value_ << token::SPACE << d.derivative_
+        << token::END_LIST;
+
+    return os;
+}
 
 
 // ************************************************************************* //

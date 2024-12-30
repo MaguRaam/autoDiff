@@ -2,7 +2,7 @@
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
    \\    /   O peration     | Website:  https://openfoam.org
-    \\  /    A nd           | Copyright (C) 2024 OpenFOAM Foundation
+    \\  /    A nd           | Copyright (C) 2011-2019 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -25,11 +25,11 @@ Class
     Foam::dual
 
 Description
+    A class representing dual numbers, which are used for forward-mode automatic differentiation.
 
 SourceFiles
     dualI.H
     dual.C
-    dualIO.C
 
 \*---------------------------------------------------------------------------*/
 
@@ -43,97 +43,76 @@ SourceFiles
 namespace Foam
 {
 
-// Forward declaration of classes
-class Istream;
-class Ostream;
-
 // Forward declaration of friend functions and operators
+
 class dual;
+
+inline dual operator+(const dual&, const dual&);
+inline dual operator-(const dual&, const dual&);
+inline dual operator*(const dual&, const dual&);
+inline dual operator/(const dual&, const dual&);
 Istream& operator>>(Istream&, dual&);
 Ostream& operator<<(Ostream&, const dual&);
 
 
 /*---------------------------------------------------------------------------*\
-                          Class dual Declaration
+                           Class dual Declaration
 \*---------------------------------------------------------------------------*/
 
 class dual
-:
-    public baseClassName
 {
-    // Private Data
+    // private data
 
-        //- Description of data_
-        dataType data_;
-
-
-    // Private Member Functions
-
+        //- Value and derivative parts of the dual number
+        scalar value_, derivative_;
 
 public:
-
-    // Static Data Members
-
-        //- Static data staticData
-        static const dataType staticData;
-
 
     // Constructors
 
         //- Construct null
-        dual();
+        inline dual();
 
-        //- Construct from components
-        dual(const dataType& data);
+        //- Construct given value and derivative
+        inline dual(const scalar value, const scalar derivative);
 
         //- Construct from Istream
         dual(Istream&);
 
-        //- Copy constructor
-        dual(const dual&);
-
-        //- Disallow default bitwise copy construction
-        dual(const dual&) = delete;
-
-
-    // Selectors
-
-        //- Select null constructed
-        static autoPtr<dual> New();
-
-
-    //- Destructor
-    ~dual();
-
 
     // Member Functions
 
-        // Access
+           // Access
 
-        // Check
+               inline scalar value() const;
+               inline scalar derivative() const;
 
-        // Edit
+           // Edit
 
-        // Write
-
-
-    // Member Operators
-
-        void operator=(const dual&);
-
-        //- Disallow default bitwise assignment
-        void operator=(const dual&) = delete;
+               inline scalar& value();
+               inline scalar& derivative();
 
 
-    // Friend Functions
+    // Friend operators
 
-    // Friend Operators
+        friend dual operator+(const dual&, const dual&);
+        friend dual operator-(const dual&, const dual&);
+        friend dual operator*(const dual&, const dual&);
+        friend dual operator/(const dual&, const dual&);
+
 
     // IOstream Operators
 
         friend Istream& operator>>(Istream&, dual&);
         friend Ostream& operator<<(Ostream&, const dual&);
+
 };
+
+
+// * * * * * * * * * * * * * * Global functions  * * * * * * * * * * * * * * //
+
+//- Return a string representation of a dual
+word name(const dual&);
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
