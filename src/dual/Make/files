@@ -1,0 +1,4 @@
+
+dual.C
+
+EXE = $(FOAM_USER_LIBBIN)/dual
