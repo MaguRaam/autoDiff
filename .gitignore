@@ -1,2 +1,16 @@
 # Ignore .vscode directory
 .vscode
+
+# Objects and archives - anywhere
+*.[oa]
+*.la
+*.so
+
+# Dependency files - anywhere
+*.dep
+
+# lnInclude (symlink) directories - anywhere
+lnInclude
+
+# Build directories - anywhere
+linux*Gcc*/
